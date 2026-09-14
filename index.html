@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix + ปฏิทิน & เตือนความจำ</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .tab-btn.active { background: #4f46e5; color: white; }
+        .tab-btn { transition: all .15s ease; }
+        .day-cell.today { box-shadow: inset 0 0 0 2px #4f46e5; }
+        .day-cell.selected { background: #eef2ff; }
+        .dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md py-4 px-6 mb-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold flex items-center gap-2">
+                    ⏳ Eisenhower Life Manager + Deadline
+                </h1>
+                <p class="text-indigo-200 text-sm">จัดลำดับความสำคัญ วางแผนล่วงหน้า และไม่ลืมเรื่องเล็กๆ ในแต่ละวัน</p>
+            </div>
+            <!-- Pomodoro Quick Widget -->
+            <div class="bg-indigo-700/60 px-4 py-2 rounded-xl flex items-center gap-4 border border-indigo-500">
+                <div>
+                    <span id="timer-display" class="text-xl font-mono font-bold">25:00</span>
+                    <span class="text-xs block text-indigo-200">เวลาโฟกัส (Pomodoro)</span>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="startTimer()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs font-medium transition">เริ่ม</button>
+                    <button onclick="pauseTimer()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-medium transition">พัก</button>
+                    <button onclick="resetTimer()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded text-xs font-medium transition">รีเซ็ต</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="max-w-7xl mx-auto w-full px-4 mb-6">
+        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+            <button class="tab-btn active flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="today" onclick="switchTab('today')">🧭 วันนี้ / แผนล่วงหน้า</button>
+            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="matrix" onclick="switchTab('matrix')">📊 เมทริกซ์งาน</button>
+            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="calendar" onclick="switchTab('calendar')">📅 ปฏิทิน</button>
+            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="reminders" onclick="switchTab('reminders')">🔔 เรื่องเล็กๆ ประจำวัน</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 flex-grow w-full mb-12">
+
+        <!-- ============ VIEW: TODAY / DASHBOARD ============ -->
+        <section id="view-today" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4">
+                <h3 class="font-bold text-rose-700 text-sm mb-2 flex items-center gap-1.5">🚨 เลยกำหนดแล้ว</h3>
+                <div id="today-overdue" class="space-y-2 text-sm"></div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                <h3 class="font-bold text-amber-700 text-sm mb-2 flex items-center gap-1.5">🔥 ครบกำหนดวันนี้</h3>
+                <div id="today-due" class="space-y-2 text-sm"></div>
+            </div>
+            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4">
+                <h3 class="font-bold text-indigo-700 text-sm mb-2 flex items-center gap-1.5">🔔 เรื่องเล็กๆ วันนี้</h3>
+                <div id="today-reminders" class="space-y-2 text-sm"></div>
+            </div>
+
+            <div class="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-4">
+                <h3 class="font-semibold text-slate-700 text-sm mb-3">📌 ไทม์ไลน์วันนี้ (งาน + เรื่องเล็กๆ เรียงตามเวลา)</h3>
+                <div id="today-timeline" class="space-y-2 text-sm"></div>
+            </div>
+        </section>
+
+        <!-- ============ VIEW: MATRIX ============ -->
+        <section id="view-matrix" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- Form เพิ่มงาน -->
+            <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit lg:sticky lg:top-6">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700 flex items-center gap-2">
+                    ➕ เพิ่มงานใหม่
+                </h2>
+                <form id="task-form" onsubmit="addTask(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">ชื่องาน / กิจกรรม</label>
+                        <input type="text" id="task-title" required placeholder="เช่น ส่งโปรเจกต์, ออกกำลังกาย"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">กำหนดส่ง (Deadline)</label>
+                        <input type="datetime-local" id="task-deadline" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">ความสำคัญ</label>
+                        <select id="task-importance" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="important">⭐ สำคัญ</option>
+                            <option value="unimportant">⚪ ไม่สำคัญ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">ความเร่งด่วน</label>
+                        <select id="task-urgency" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="urgent">🔥 เร่งด่วน</option>
+                            <option value="not-urgent">⏳ ไม่เร่งด่วน</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
+                        บันทึกเข้าเมทริกซ์
+                    </button>
+                </form>
+            </section>
+
+            <!-- Matrix Grid (4 Quadrants) -->
+            <section class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="bg-rose-50/60 border border-rose-200 rounded-2xl p-4 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 border-b border-rose-200 pb-2">
+                        <h3 class="font-bold text-rose-700 flex items-center gap-1.5 text-sm">🚨 Q1: ทำทันที (Do First)</h3>
+                        <span class="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-medium" id="count-q1">0</span>
+                    </div>
+                    <p class="text-xs text-rose-600/80 mb-3">วิกฤต, งานด่วนที่มีผลกระทบสูง</p>
+                    <div id="list-q1" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                </div>
+
+                <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 border-b border-emerald-200 pb-2">
+                        <h3 class="font-bold text-emerald-700 flex items-center gap-1.5 text-sm">📅 Q2: วางแผนทำ (Schedule)</h3>
+                        <span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-medium" id="count-q2">0</span>
+                    </div>
+                    <p class="text-xs text-emerald-600/80 mb-3">เป้าหมายชีวิต, พัฒนาตัวเอง, สุขภาพ</p>
+                    <div id="list-q2" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                </div>
+
+                <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 border-b border-amber-200 pb-2">
+                        <h3 class="font-bold text-amber-700 flex items-center gap-1.5 text-sm">👥 Q3: ให้คนอื่นทำแทน (Delegate)</h3>
+                        <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium" id="count-q3">0</span>
+                    </div>
+                    <p class="text-xs text-amber-600/80 mb-3">การประชุมไร้สาระ, คำขอร้องคนอื่น</p>
+                    <div id="list-q3" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                </div>
+
+                <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 border-b border-slate-200 pb-2">
+                        <h3 class="font-bold text-slate-600 flex items-center gap-1.5 text-sm">🗑️ Q4: ตัดทิ้ง/เลิกทำ (Eliminate)</h3>
+                        <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-medium" id="count-q4">0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">ไถฟีดโซเชียลนานเกินไป, เกมฆ่าเวลา</p>
+                    <div id="list-q4" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                </div>
+
+            </section>
+        </section>
+
+        <!-- ============ VIEW: CALENDAR ============ -->
+        <section id="view-calendar" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="changeMonth(-1)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm">← เดือนก่อน</button>
+                    <h3 id="calendar-title" class="font-semibold text-slate-700"></h3>
+                    <button onclick="changeMonth(1)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm">เดือนถัดไป →</button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-xs text-slate-400 mb-1">
+                    <div>อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 id="selected-day-title" class="font-semibold text-slate-700 text-sm">เลือกวันที่เพื่อดูงาน</h3>
+                    <button id="add-on-day-btn" onclick="addTaskOnSelectedDay()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded-lg hidden">+ เพิ่มงานวันนี้</button>
+                </div>
+                <div id="selected-day-list" class="space-y-2 text-sm"></div>
+            </div>
+        </section>
+
+        <!-- ============ VIEW: REMINDERS ============ -->
+        <section id="view-reminders" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                <h2 class="text-lg font-semibold mb-1 text-slate-700 flex items-center gap-2">➕ เพิ่มเรื่องเล็กๆ ต้องทำ</h2>
+                <p class="text-xs text-slate-500 mb-4">เช่น กินยา, โทรกลับแฟน, ทิ้งขยะ — ตั้งเตือนตามเวลา หรือตามสถานที่ก็ได้</p>
+                <form id="reminder-form" onsubmit="addReminder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">เรื่องที่ต้องทำ</label>
+                        <input type="text" id="reminder-text" required placeholder="เช่น กินยาลดความดัน"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">รูปแบบการเตือน</label>
+                        <select id="reminder-type" onchange="renderReminderTypeFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="time">⏰ ทุกวัน เวลาเดิม</option>
+                            <option value="once">📆 ครั้งเดียว (วัน-เวลาที่กำหนด)</option>
+                            <option value="location">📍 เมื่อถึงสถานที่</option>
+                        </select>
+                    </div>
+                    <div id="reminder-type-fields"></div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
+                        บันทึกการเตือน
+                    </button>
+                </form>
+                <p id="notif-permission-note" class="text-xs text-amber-600 mt-3 hidden">⚠️ กรุณาอนุญาตการแจ้งเตือน (Notification) ของเบราว์เซอร์ เพื่อให้ระบบเตือนได้ตรงเวลา และเปิดหน้านี้ค้างไว้ในเบราว์เซอร์</p>
+            </section>
+
+            <section class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700 flex items-center gap-2">🔔 รายการเรื่องเล็กๆ ทั้งหมด</h2>
+                <div id="reminder-list" class="space-y-2.5"></div>
+            </section>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200 bg-white">
+        Eisenhower Matrix Web App &bull; ข้อมูลถูกบันทึกไว้ในเบราว์เซอร์ของคุณอัตโนมัติ (localStorage)
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
