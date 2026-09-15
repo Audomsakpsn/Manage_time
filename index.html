@@ -151,7 +151,7 @@
                         <h3 class="font-bold text-rose-700 text-sm">🚨 Q1: ทำทันที</h3>
                         <span class="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-medium" id="count-q1">0</span>
                     </div>
-                    <p class="text-xs text-rose-600/80 my-2">วิกฤต งานด่วนที่มีผลกระทบสูง</p>
+                    <p class="text-xs text-rose-600/80 my-2">งานด่วนที่มีผลกระทบสูง ต้องทำเดี๋ยวนี้</p>
                     <div id="list-q1" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
                 <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 flex flex-col">
@@ -167,7 +167,7 @@
                         <h3 class="font-bold text-amber-700 text-sm">👥 Q3: ให้คนอื่นทำแทน</h3>
                         <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium" id="count-q3">0</span>
                     </div>
-                    <p class="text-xs text-amber-600/80 my-2">ประชุมที่ไม่ต้องใช้เราตัดสินใจ งานฝากคนอื่นได้</p>
+                    <p class="text-xs text-amber-600/80 my-2">ประชุมที่ไม่ต้องใช้เราตัดสินใจ งานฝากคนอื่นทำก่อนได้</p>
                     <div id="list-q3" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
                 <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 flex flex-col">
@@ -175,7 +175,7 @@
                         <h3 class="font-bold text-slate-600 text-sm">🗑️ Q4: ตัดทิ้ง</h3>
                         <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-medium" id="count-q4">0</span>
                     </div>
-                    <p class="text-xs text-slate-500 my-2">ไถฟีดนานเกินไป งานที่ไม่ได้พาไปไหน</p>
+                    <p class="text-xs text-slate-500 my-2">กิจกรรมฆ่าเวลา งานที่ไม่ได้พาไปไหน</p>
                     <div id="list-q4" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
             </section>
@@ -362,7 +362,7 @@
         <section id="view-reminders" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
                 <h2 class="text-lg font-semibold mb-1 text-slate-700">➕ เพิ่มเรื่องเล็กๆ ต้องทำ</h2>
-                <p class="text-xs text-slate-500 mb-4">เช่น กินยา โทรกลับแฟน ทิ้งขยะ ตั้งเตือนตามเวลาหรือตามสถานที่ก็ได้</p>
+                <p class="text-xs text-slate-500 mb-4">เช่น กินยา ซื้อของ ทิ้งขยะ ตั้งเตือนตามเวลาหรือตามสถานที่</p>
                 <form id="reminder-form" onsubmit="addReminder(event)" class="space-y-4">
                     <div>
                         <label for="reminder-text" class="block text-sm font-medium text-slate-600 mb-1">เรื่องที่ต้องทำ</label>
@@ -373,8 +373,8 @@
                         <label for="reminder-type" class="block text-sm font-medium text-slate-600 mb-1">รูปแบบการเตือน</label>
                         <select id="reminder-type" onchange="renderReminderTypeFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                             <option value="time">⏰ ทุกวัน เวลาเดิม</option>
-                            <option value="once">📆 ครั้งเดียว</option>
-                            <option value="location">📍 เมื่อถึงสถานที่</option>
+                            <option value="once">📆 กำหนดวันและเวลา</option>
+                            <option value="location">📍 สถานที่</option>
                         </select>
                     </div>
                     <div id="reminder-type-fields"></div>
