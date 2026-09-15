@@ -3,164 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eisenhower Matrix + ปฏิทิน & เตือนความจำ</title>
+    <title>Eisenhower Life Manager — งาน ปฏิทิน เป้าหมาย และสถิติ</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Prompt', sans-serif; }
         .tab-btn.active { background: #4f46e5; color: white; }
-        .tab-btn { transition: all .15s ease; }
+        .tab-btn { transition: background .15s ease, color .15s ease; }
         .day-cell.today { box-shadow: inset 0 0 0 2px #4f46e5; }
         .day-cell.selected { background: #eef2ff; }
         .dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+        :focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header -->
     <header class="bg-indigo-600 text-white shadow-md py-4 px-6 mb-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold flex items-center gap-2">
-                    ⏳ Eisenhower Life Manager + Deadline
-                </h1>
-                <p class="text-indigo-200 text-sm">จัดลำดับความสำคัญ วางแผนล่วงหน้า และไม่ลืมเรื่องเล็กๆ ในแต่ละวัน</p>
+                <h1 class="text-2xl font-bold flex items-center gap-2">⏳ Eisenhower Life Manager</h1>
+                <p class="text-indigo-200 text-sm">จัดลำดับงาน วางแผนล่วงหน้า จับเวลาโฟกัส และติดตามเป้าหมายของคุณ</p>
             </div>
-            <!-- Pomodoro Quick Widget -->
             <div class="bg-indigo-700/60 px-4 py-2 rounded-xl flex items-center gap-4 border border-indigo-500">
                 <div>
                     <span id="timer-display" class="text-xl font-mono font-bold">25:00</span>
-                    <span class="text-xs block text-indigo-200">เวลาโฟกัส (Pomodoro)</span>
+                    <span class="text-xs block text-indigo-200">นับถอยหลังโฟกัส (Pomodoro)</span>
                 </div>
                 <div class="flex gap-1">
-                    <button onclick="startTimer()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs font-medium transition">เริ่ม</button>
-                    <button onclick="pauseTimer()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-medium transition">พัก</button>
-                    <button onclick="resetTimer()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded text-xs font-medium transition">รีเซ็ต</button>
+                    <button onclick="startTimer()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs font-medium">เริ่ม</button>
+                    <button onclick="pauseTimer()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-medium">พัก</button>
+                    <button onclick="resetTimer()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded text-xs font-medium">รีเซ็ต</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Tabs -->
     <nav class="max-w-7xl mx-auto w-full px-4 mb-6">
         <div class="flex flex-wrap gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-            <button class="tab-btn active flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="today" onclick="switchTab('today')">🧭 วันนี้ / แผนล่วงหน้า</button>
-            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="matrix" onclick="switchTab('matrix')">📊 เพิ่มงาน</button>
-            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="calendar" onclick="switchTab('calendar')">📅 ปฏิทิน</button>
-            <button class="tab-btn flex-1 min-w-[120px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="reminders" onclick="switchTab('reminders')">🔔 เรื่องเล็กๆ ประจำวัน</button>
+            <button class="tab-btn active flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="today" onclick="switchTab('today')">🧭 วันนี้</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="matrix" onclick="switchTab('matrix')">📊 งานทั้งหมด</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="calendar" onclick="switchTab('calendar')">📅 ปฏิทิน</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="focus" onclick="switchTab('focus')">⏱️ จับเวลากิจกรรม</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="goals" onclick="switchTab('goals')">🎯 เป้าหมาย</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="stats" onclick="switchTab('stats')">📈 สถิติ</button>
+            <button class="tab-btn flex-1 min-w-[110px] py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-indigo-50" data-tab="reminders" onclick="switchTab('reminders')">🔔 เตือนความจำ</button>
         </div>
     </nav>
 
-    <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 flex-grow w-full mb-12">
 
-        <!-- ============ VIEW: TODAY / DASHBOARD ============ -->
-        <section id="view-today" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4">
-                <h3 class="font-bold text-rose-700 text-sm mb-2 flex items-center gap-1.5">🚨 เลยกำหนดแล้ว</h3>
-                <div id="today-overdue" class="space-y-2 text-sm"></div>
-            </div>
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                <h3 class="font-bold text-amber-700 text-sm mb-2 flex items-center gap-1.5">🔥 ครบกำหนดวันนี้</h3>
-                <div id="today-due" class="space-y-2 text-sm"></div>
-            </div>
-            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4">
-                <h3 class="font-bold text-indigo-700 text-sm mb-2 flex items-center gap-1.5">🔔 เรื่องเล็กๆ วันนี้</h3>
-                <div id="today-reminders" class="space-y-2 text-sm"></div>
+        <!-- ============ วันนี้ ============ -->
+        <section id="view-today" class="space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4">
+                    <h3 class="font-bold text-rose-700 text-sm mb-2">🚨 เลยกำหนดแล้ว</h3>
+                    <div id="today-overdue" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                    <h3 class="font-bold text-amber-700 text-sm mb-2">🔥 ครบกำหนดวันนี้</h3>
+                    <div id="today-due" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4">
+                    <h3 class="font-bold text-indigo-700 text-sm mb-2">🔔 เรื่องเล็กๆ วันนี้</h3>
+                    <div id="today-reminders" class="space-y-2 text-sm"></div>
+                </div>
             </div>
 
-            <div class="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-4">
-                <h3 class="font-semibold text-slate-700 text-sm mb-3">📌 ไทม์ไลน์วันนี้ (งาน + เรื่องเล็กๆ เรียงตามเวลา)</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">เวลาโฟกัสวันนี้</p>
+                    <p id="kpi-focus-today" class="text-2xl font-bold text-slate-800 mt-1">0 นาที</p>
+                    <p id="kpi-focus-compare" class="text-xs text-slate-400 mt-1"></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">งานที่ปิดได้สัปดาห์นี้</p>
+                    <p id="kpi-done-week" class="text-2xl font-bold text-slate-800 mt-1">0 งาน</p>
+                    <p id="kpi-done-compare" class="text-xs text-slate-400 mt-1"></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">ทำติดต่อกัน</p>
+                    <p id="kpi-streak" class="text-2xl font-bold text-slate-800 mt-1">0 วัน</p>
+                    <p class="text-xs text-slate-400 mt-1">นับวันที่มีการโฟกัสอย่างน้อย 1 ครั้ง</p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <h3 class="font-semibold text-slate-700 text-sm mb-3">🎯 ความคืบหน้าเป้าหมาย</h3>
+                <div id="today-goals" class="space-y-3"></div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <h3 class="font-semibold text-slate-700 text-sm mb-3">📌 ไทม์ไลน์วันนี้</h3>
                 <div id="today-timeline" class="space-y-2 text-sm"></div>
             </div>
         </section>
 
-        <!-- ============ VIEW: MATRIX ============ -->
+        <!-- ============ งานทั้งหมด ============ -->
         <section id="view-matrix" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-            <!-- Form เพิ่มงาน -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit lg:sticky lg:top-6">
-                <h2 class="text-lg font-semibold mb-4 text-slate-700 flex items-center gap-2">
-                    ➕ เพิ่มงานใหม่
-                </h2>
+                <h2 class="text-lg font-semibold mb-4 text-slate-700">➕ เพิ่มงานใหม่</h2>
                 <form id="task-form" onsubmit="addTask(event)" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">ชื่องาน / กิจกรรม</label>
-                        <input type="text" id="task-title" required placeholder="เช่น ส่งโปรเจกต์, ออกกำลังกาย"
+                        <label for="task-title" class="block text-sm font-medium text-slate-600 mb-1">ชื่องาน</label>
+                        <input type="text" id="task-title" required placeholder="เช่น ส่งโปรเจกต์ภาคนิพนธ์"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">กำหนดส่ง (Deadline)</label>
+                        <label for="task-desc" class="block text-sm font-medium text-slate-600 mb-1">คำอธิบาย</label>
+                        <textarea id="task-desc" rows="3" placeholder="รายละเอียดงาน สิ่งที่ต้องเตรียม หรือขั้นตอนที่ต้องทำ"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-y"></textarea>
+                    </div>
+                    <div>
+                        <label for="task-deadline" class="block text-sm font-medium text-slate-600 mb-1">กำหนดส่ง</label>
                         <input type="datetime-local" id="task-deadline" required
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">ความสำคัญ</label>
+                        <label for="task-importance" class="block text-sm font-medium text-slate-600 mb-1">ความสำคัญ</label>
                         <select id="task-importance" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
                             <option value="important">⭐ สำคัญ</option>
                             <option value="unimportant">⚪ ไม่สำคัญ</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">ความเร่งด่วน</label>
+                        <label for="task-urgency" class="block text-sm font-medium text-slate-600 mb-1">ความเร่งด่วน</label>
                         <select id="task-urgency" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
                             <option value="urgent">🔥 เร่งด่วน</option>
                             <option value="not-urgent">⏳ ไม่เร่งด่วน</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
-                        บันทึกงาน
-                    </button>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm">บันทึกงาน</button>
                 </form>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <p class="text-xs text-slate-500 mb-2">ระดับความคืบหน้าแสดงด้วยสี</p>
+                    <div id="level-legend" class="flex flex-wrap gap-2"></div>
+                </div>
             </section>
 
-            <!-- Matrix Grid (4 Quadrants) -->
             <section class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-
                 <div class="bg-rose-50/60 border border-rose-200 rounded-2xl p-4 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 border-b border-rose-200 pb-2">
-                        <h3 class="font-bold text-rose-700 flex items-center gap-1.5 text-sm">🚨 Q1: ทำทันที (Do First)</h3>
+                    <div class="flex justify-between items-center mb-1 border-b border-rose-200 pb-2">
+                        <h3 class="font-bold text-rose-700 text-sm">🚨 Q1: ทำทันที</h3>
                         <span class="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-medium" id="count-q1">0</span>
                     </div>
-                    <p class="text-xs text-rose-600/80 mb-3">วิกฤต, งานด่วนที่มีผลกระทบสูง</p>
-                    <div id="list-q1" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                    <p class="text-xs text-rose-600/80 my-2">วิกฤต งานด่วนที่มีผลกระทบสูง</p>
+                    <div id="list-q1" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
-
                 <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 border-b border-emerald-200 pb-2">
-                        <h3 class="font-bold text-emerald-700 flex items-center gap-1.5 text-sm">📅 Q2: วางแผนทำ (Schedule)</h3>
+                    <div class="flex justify-between items-center mb-1 border-b border-emerald-200 pb-2">
+                        <h3 class="font-bold text-emerald-700 text-sm">📅 Q2: วางแผนทำ</h3>
                         <span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-medium" id="count-q2">0</span>
                     </div>
-                    <p class="text-xs text-emerald-600/80 mb-3">เป้าหมายชีวิต, พัฒนาตัวเอง, สุขภาพ</p>
-                    <div id="list-q2" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                    <p class="text-xs text-emerald-600/80 my-2">เป้าหมายชีวิต พัฒนาตัวเอง สุขภาพ</p>
+                    <div id="list-q2" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
-
                 <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 border-b border-amber-200 pb-2">
-                        <h3 class="font-bold text-amber-700 flex items-center gap-1.5 text-sm">👥 Q3: ให้คนอื่นทำแทน (Delegate)</h3>
+                    <div class="flex justify-between items-center mb-1 border-b border-amber-200 pb-2">
+                        <h3 class="font-bold text-amber-700 text-sm">👥 Q3: ให้คนอื่นทำแทน</h3>
                         <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium" id="count-q3">0</span>
                     </div>
-                    <p class="text-xs text-amber-600/80 mb-3">การประชุมไร้สาระ, คำขอร้องคนอื่น</p>
-                    <div id="list-q3" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                    <p class="text-xs text-amber-600/80 my-2">ประชุมที่ไม่ต้องใช้เราตัดสินใจ งานฝากคนอื่นได้</p>
+                    <div id="list-q3" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
-
                 <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 border-b border-slate-200 pb-2">
-                        <h3 class="font-bold text-slate-600 flex items-center gap-1.5 text-sm">🗑️ Q4: ตัดทิ้ง/เลิกทำ (Eliminate)</h3>
+                    <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-2">
+                        <h3 class="font-bold text-slate-600 text-sm">🗑️ Q4: ตัดทิ้ง</h3>
                         <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-medium" id="count-q4">0</span>
                     </div>
-                    <p class="text-xs text-slate-500 mb-3">ไถฟีดโซเชียล, เกมฆ่าเวลา</p>
-                    <div id="list-q4" class="space-y-2.5 flex-grow overflow-y-auto max-h-[350px]"></div>
+                    <p class="text-xs text-slate-500 my-2">ไถฟีดนานเกินไป งานที่ไม่ได้พาไปไหน</p>
+                    <div id="list-q4" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
-
             </section>
         </section>
 
-        <!-- ============ VIEW: CALENDAR ============ -->
+        <!-- ============ ปฏิทิน ============ -->
         <section id="view-calendar" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4">
                 <div class="flex items-center justify-between mb-4">
@@ -172,57 +193,222 @@
                     <div>อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div>
                 </div>
                 <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+                <div class="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                    <p>แถบสีใต้วันที่ = ความคืบหน้าเฉลี่ยของงานที่ครบกำหนดวันนั้น</p>
+                    <p>จุดสีน้ำเงินเข้ม = วันที่มีการจับเวลาโฟกัส</p>
+                </div>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <div class="flex items-center justify-between mb-3">
                     <h3 id="selected-day-title" class="font-semibold text-slate-700 text-sm">เลือกวันที่เพื่อดูงาน</h3>
                     <button id="add-on-day-btn" onclick="addTaskOnSelectedDay()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded-lg hidden">+ เพิ่มงานวันนี้</button>
                 </div>
+                <div id="selected-day-summary" class="mb-3"></div>
                 <div id="selected-day-list" class="space-y-2 text-sm"></div>
             </div>
         </section>
 
-        <!-- ============ VIEW: REMINDERS ============ -->
-        <section id="view-reminders" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
-                <h2 class="text-lg font-semibold mb-1 text-slate-700 flex items-center gap-2">➕ เพิ่มเรื่องเล็กๆ ต้องทำ</h2>
-                <p class="text-xs text-slate-500 mb-4">เช่น กินยา, ทำความสะอาดห้อง, ทิ้งขยะ — เตือนตามเวลาหรือตามสถานที่</p>
-                <form id="reminder-form" onsubmit="addReminder(event)" class="space-y-4">
+        <!-- ============ จับเวลากิจกรรม ============ -->
+        <section id="view-focus" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                <h2 class="text-lg font-semibold mb-1 text-slate-700">⏱️ จับเวลากิจกรรม</h2>
+                <p class="text-xs text-slate-500 mb-4">เลือกกิจกรรม กดเริ่ม แล้วกดจบเมื่อทำเสร็จ เวลาจะถูกบันทึกเข้าสถิติและเป้าหมายอัตโนมัติ</p>
+
+                <div class="text-center py-6 bg-slate-50 rounded-xl border border-slate-200 mb-4">
+                    <p id="stopwatch-display" class="text-4xl font-mono font-bold text-slate-800">00:00:00</p>
+                    <p id="stopwatch-activity" class="text-xs text-slate-500 mt-2">ยังไม่ได้เริ่มจับเวลา</p>
+                </div>
+
+                <div class="space-y-3">
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">เรื่องที่ต้องทำ</label>
-                        <input type="text" id="reminder-text" required placeholder="เช่น กินยาลดความดัน"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <label for="focus-activity" class="block text-sm font-medium text-slate-600 mb-1">กิจกรรม</label>
+                        <select id="focus-activity" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="อ่านหนังสือ">📖 อ่านหนังสือ</option>
+                            <option value="ทำงาน">💼 ทำงาน</option>
+                            <option value="เรียน">🎓 เรียน</option>
+                            <option value="ออกกำลังกาย">🏃 ออกกำลังกาย</option>
+                            <option value="งานอดิเรก">🎨 งานอดิเรก</option>
+                            <option value="อื่นๆ">✳️ อื่นๆ</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-1">รูปแบบการเตือน</label>
-                        <select id="reminder-type" onchange="renderReminderTypeFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                        <label for="focus-task-link" class="block text-sm font-medium text-slate-600 mb-1">ผูกกับงาน (ถ้ามี)</label>
+                        <select id="focus-task-link" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="">— ไม่ผูกกับงานใด —</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="focus-note" class="block text-sm font-medium text-slate-600 mb-1">บันทึกสั้นๆ</label>
+                        <input type="text" id="focus-note" placeholder="เช่น อ่านบทที่ 4 จบ" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="stopwatch-start" onclick="startStopwatch()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm">เริ่มจับเวลา</button>
+                        <button id="stopwatch-stop" onclick="stopStopwatch()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-lg text-sm hidden">จบและบันทึก</button>
+                    </div>
+                    <button onclick="openManualSession()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-sm">บันทึกเวลาย้อนหลังเอง</button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">เวลาสะสมแยกตามกิจกรรม (7 วันล่าสุด)</h3>
+                    <div id="focus-by-activity" class="space-y-2.5"></div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">ประวัติการจับเวลา</h3>
+                    <div id="session-list" class="space-y-2 max-h-[360px] overflow-y-auto"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ เป้าหมาย ============ -->
+        <section id="view-goals" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                <h2 class="text-lg font-semibold mb-1 text-slate-700">🎯 ตั้งเป้าหมาย</h2>
+                <p class="text-xs text-slate-500 mb-4">ตั้งเป้าเวลาที่อยากทำในแต่ละกิจกรรม แล้วระบบจะนับความคืบหน้าจากการจับเวลาให้เอง</p>
+                <form id="goal-form" onsubmit="addGoal(event)" class="space-y-4">
+                    <div>
+                        <label for="goal-title" class="block text-sm font-medium text-slate-600 mb-1">ชื่อเป้าหมาย</label>
+                        <input type="text" id="goal-title" required placeholder="เช่น อ่านหนังสือให้ได้สัปดาห์ละ 5 ชั่วโมง"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label for="goal-activity" class="block text-sm font-medium text-slate-600 mb-1">นับเวลาจากกิจกรรม</label>
+                        <select id="goal-activity" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                            <option value="อ่านหนังสือ">📖 อ่านหนังสือ</option>
+                            <option value="ทำงาน">💼 ทำงาน</option>
+                            <option value="เรียน">🎓 เรียน</option>
+                            <option value="ออกกำลังกาย">🏃 ออกกำลังกาย</option>
+                            <option value="งานอดิเรก">🎨 งานอดิเรก</option>
+                            <option value="อื่นๆ">✳️ อื่นๆ</option>
+                            <option value="__all__">รวมทุกกิจกรรม</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="goal-target" class="block text-sm font-medium text-slate-600 mb-1">เป้า (นาที)</label>
+                            <input type="number" id="goal-target" required min="5" value="300" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label for="goal-period" class="block text-sm font-medium text-slate-600 mb-1">ต่อรอบ</label>
+                            <select id="goal-period" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                                <option value="day">ต่อวัน</option>
+                                <option value="week" selected>ต่อสัปดาห์</option>
+                                <option value="month">ต่อเดือน</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm">บันทึกเป้าหมาย</button>
+                </form>
+            </div>
+
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-semibold text-slate-700 text-sm mb-1">ระดับความคืบหน้า</h3>
+                    <p class="text-xs text-slate-500 mb-3">แต่ละเป้าหมายจะเลื่อนระดับตามเปอร์เซ็นต์ที่ทำได้ในรอบปัจจุบัน</p>
+                    <div id="goal-legend" class="flex flex-wrap gap-2"></div>
+                </div>
+                <div id="goal-list" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- ============ สถิติ ============ -->
+        <section id="view-stats" class="hidden space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">เวลาโฟกัสรวม 7 วัน</p>
+                    <p id="stat-week-total" class="text-2xl font-bold text-slate-800 mt-1">0</p>
+                    <p id="stat-week-trend" class="text-xs mt-1 text-slate-400"></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">เฉลี่ยต่อวัน</p>
+                    <p id="stat-daily-avg" class="text-2xl font-bold text-slate-800 mt-1">0</p>
+                    <p class="text-xs text-slate-400 mt-1">คิดจาก 7 วันล่าสุด</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">อัตราส่งงานทันกำหนด</p>
+                    <p id="stat-ontime" class="text-2xl font-bold text-slate-800 mt-1">—</p>
+                    <p id="stat-ontime-detail" class="text-xs text-slate-400 mt-1"></p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <p class="text-xs text-slate-500">ความคืบหน้าเฉลี่ยของงานที่ค้าง</p>
+                    <p id="stat-avg-progress" class="text-2xl font-bold text-slate-800 mt-1">0%</p>
+                    <p id="stat-open-count" class="text-xs text-slate-400 mt-1"></p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-slate-700 text-sm">แนวโน้มเวลาโฟกัสรายวัน</h3>
+                    <select id="stat-range" onchange="renderStats()" class="text-xs border border-slate-300 rounded-lg px-2 py-1 bg-white">
+                        <option value="7">7 วันล่าสุด</option>
+                        <option value="14">14 วันล่าสุด</option>
+                        <option value="30">30 วันล่าสุด</option>
+                    </select>
+                </div>
+                <div id="stat-chart"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">งานที่ปิดได้ในแต่ละสัปดาห์</h3>
+                    <div id="stat-weekly-done"></div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">สัดส่วนเวลาแยกตามกิจกรรม</h3>
+                    <div id="stat-activity-split" class="space-y-2.5"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ เตือนความจำ ============ -->
+        <section id="view-reminders" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                <h2 class="text-lg font-semibold mb-1 text-slate-700">➕ เพิ่มเรื่องเล็กๆ ต้องทำ</h2>
+                <p class="text-xs text-slate-500 mb-4">เช่น กินยา โทรกลับแฟน ทิ้งขยะ ตั้งเตือนตามเวลาหรือตามสถานที่ก็ได้</p>
+                <form id="reminder-form" onsubmit="addReminder(event)" class="space-y-4">
+                    <div>
+                        <label for="reminder-text" class="block text-sm font-medium text-slate-600 mb-1">เรื่องที่ต้องทำ</label>
+                        <input type="text" id="reminder-text" required placeholder="เช่น กินยาลดความดัน"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label for="reminder-type" class="block text-sm font-medium text-slate-600 mb-1">รูปแบบการเตือน</label>
+                        <select id="reminder-type" onchange="renderReminderTypeFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                             <option value="time">⏰ ทุกวัน เวลาเดิม</option>
-                            <option value="once">📆 วัน-เวลาที่กำหนด</option>
-                            <option value="location">📍 สถานที่</option>
+                            <option value="once">📆 ครั้งเดียว</option>
+                            <option value="location">📍 เมื่อถึงสถานที่</option>
                         </select>
                     </div>
                     <div id="reminder-type-fields"></div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
-                        บันทึกการเตือน
-                    </button>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm">บันทึกการเตือน</button>
                 </form>
-                <p id="notif-permission-note" class="text-xs text-amber-600 mt-3 hidden">⚠️ กรุณาอนุญาตการแจ้งเตือน (Notification) ของเบราว์เซอร์ เพื่อให้ระบบเตือนได้ตรงเวลา และเปิดหน้านี้ค้างไว้ในเบราว์เซอร์</p>
+                <p id="notif-permission-note" class="text-xs text-amber-600 mt-3 hidden">อนุญาตการแจ้งเตือนของเบราว์เซอร์ และเปิดหน้านี้ค้างไว้ เพื่อให้ระบบเตือนได้ตรงเวลา</p>
             </section>
 
             <section class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-semibold mb-4 text-slate-700 flex items-center gap-2">🔔 รายการเรื่องเล็กๆ ทั้งหมด</h2>
+                <h2 class="text-lg font-semibold mb-4 text-slate-700">🔔 รายการทั้งหมด</h2>
                 <div id="reminder-list" class="space-y-2.5"></div>
             </section>
         </section>
 
     </main>
 
-    <!-- Footer -->
+    <!-- Modal: รายละเอียดงาน -->
+    <div id="task-modal" class="hidden fixed inset-0 bg-slate-900/50 z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <h3 id="modal-title" class="text-lg font-semibold text-slate-800"></h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 text-xl leading-none">✕</button>
+            </div>
+            <div id="modal-body" class="space-y-4"></div>
+        </div>
+    </div>
+
     <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200 bg-white">
-        Eisenhower Matrix Web App &bull; ข้อมูลถูกบันทึกไว้ในเบราว์เซอร์ของคุณอัตโนมัติ (localStorage)
+        ข้อมูลทั้งหมดถูกบันทึกไว้ในเบราว์เซอร์ของคุณ (localStorage) ไม่มีการส่งออกไปที่เซิร์ฟเวอร์
     </footer>
 
-    <!-- JavaScript Application Logic -->
     <script src="script.js"></script>
 </body>
 </html>
