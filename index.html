@@ -172,10 +172,10 @@
                 </div>
                 <div class="bg-slate-100 border border-slate-200 rounded-2xl p-4 flex flex-col">
                     <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-2">
-                        <h3 class="font-bold text-slate-600 text-sm">🗑️ Q4: ตัดทิ้ง</h3>
+                        <h3 class="font-bold text-slate-600 text-sm">🎮 Q4: ไว้ทำท้ายสุด</h3>
                         <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-medium" id="count-q4">0</span>
                     </div>
-                    <p class="text-xs text-slate-500 my-2">กิจกรรมฆ่าเวลา งานที่ไม่ได้พาไปไหน</p>
+                    <p class="text-xs text-slate-500 my-2">กิจกรรมฆ่าเวลา กิจกรรมเสริมความสุขทางใจ</p>
                     <div id="list-q4" class="space-y-2.5 flex-grow overflow-y-auto max-h-[420px]"></div>
                 </div>
             </section>
@@ -228,6 +228,7 @@
                             <option value="เรียน">🎓 เรียน</option>
                             <option value="ออกกำลังกาย">🏃 ออกกำลังกาย</option>
                             <option value="งานอดิเรก">🎨 งานอดิเรก</option>
+                            <option value="ธุระส่วนตัว">🗒 ธุรกิจส่วนตัว</option>
                         </select>
                     </div>
                     <div>
@@ -279,11 +280,12 @@
                             <option value="เรียน">🎓 เรียน</option>
                             <option value="ออกกำลังกาย">🏃 ออกกำลังกาย</option>
                             <option value="งานอดิเรก">🎨 งานอดิเรก</option>
+                            <option value="ธุระส่วนตัว">🗒 ธุรกิจส่วนตัว</option>
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label for="goal-target" class="block text-sm font-medium text-slate-600 mb-1">เป้า (นาที)</label>
+                            <label for="goal-target" class="block text-sm font-medium text-slate-600 mb-1">เป้าหมาย (นาที)</label>
                             <input type="number" id="goal-target" required min="5" value="300" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                         </div>
                         <div>
@@ -361,18 +363,18 @@
         <!-- ============ เตือนความจำ ============ -->
         <section id="view-reminders" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
-                <h2 class="text-lg font-semibold mb-1 text-slate-700">➕ เพิ่มเรื่องเล็กๆ ต้องทำ</h2>
+                <h2 class="text-lg font-semibold mb-1 text-slate-700">➕ เพิ่มเรื่องเล็กๆที่ต้องทำ</h2>
                 <p class="text-xs text-slate-500 mb-4">เช่น กินยา ซื้อของ ทิ้งขยะ ตั้งเตือนตามเวลาหรือตามสถานที่</p>
                 <form id="reminder-form" onsubmit="addReminder(event)" class="space-y-4">
                     <div>
                         <label for="reminder-text" class="block text-sm font-medium text-slate-600 mb-1">เรื่องที่ต้องทำ</label>
-                        <input type="text" id="reminder-text" required placeholder="เช่น กินยาลดความดัน"
+                        <input type="text" id="reminder-text" required placeholder="เช่น กินยา"
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                     </div>
                     <div>
                         <label for="reminder-type" class="block text-sm font-medium text-slate-600 mb-1">รูปแบบการเตือน</label>
                         <select id="reminder-type" onchange="renderReminderTypeFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-                            <option value="time">⏰ ทุกวัน เวลาเดิม</option>
+                            <option value="time">⏰ ทุกวันและเวลาเดิม</option>
                             <option value="once">📆 กำหนดวันและเวลา</option>
                             <option value="location">📍 สถานที่</option>
                         </select>
