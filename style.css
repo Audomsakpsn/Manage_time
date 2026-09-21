@@ -245,7 +245,7 @@ svg { display: block; }
   background: none;
   border: none;
   border-radius: var(--radius-full);
-  opacity: 0.15;
+  opacity: 0.80;
   cursor: pointer;
   transition: opacity var(--transition), background var(--transition);
 }
