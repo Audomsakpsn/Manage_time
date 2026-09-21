@@ -1,4 +1,7 @@
 /* ============================================================================
+   Eisenhower Life Manager — Stylesheet
+   ----------------------------------------------------------------------------
+/* ============================================================================
    1. ตัวแปรปรับแต่ง
    ปรับค่าในบล็อกนี้เพื่อเปลี่ยนหน้าตาของทั้งแอป ไม่ต้องแก้ไฟล์อื่น
    ========================================================================== */
@@ -244,36 +247,6 @@ svg { display: block; }
 }
 .pomodoro__label { display: block; font-size: var(--fs-xs); opacity: 0.75; }
 .pomodoro__buttons { display: flex; gap: var(--space-1); }
-
-/* --- แถบปรับธีม --- */
-.theme-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.1);
-}
-.theme-controls label { font-size: var(--fs-xs); opacity: 0.85; }
-.theme-controls select {
-  font: inherit;
-  font-size: var(--fs-xs);
-  padding: var(--space-1) var(--space-2);
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-.theme-controls input[type="color"] {
-  inline-size: 28px;
-  block-size: 28px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: none;
-  cursor: pointer;
-}
 
 /* --- แท็บ --- */
 .tabs {
@@ -710,6 +683,85 @@ svg { display: block; }
 /* --- กราฟ --- */
 .chart { inline-size: 100%; }
 .chart svg { inline-size: 100%; block-size: auto; }
+
+/* --- แบบสอบถามความคิดเห็น --- */
+.likert { margin-bottom: var(--space-5); }
+.likert:last-of-type { margin-bottom: var(--space-4); }
+.likert__question {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+.likert__options { display: flex; gap: var(--space-2); }
+
+.likert__opt { flex: 1; }
+.likert__opt input { position: absolute; opacity: 0; pointer-events: none; }
+.likert__opt span {
+  display: block;
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--fs-sm);
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.likert__opt input:checked + span {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: var(--fw-medium);
+}
+.likert__opt input:focus-visible + span { outline: var(--focus-ring); outline-offset: 2px; }
+.likert__scale-hint {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--color-text-faint);
+}
+
+/* ตัวเลือกแบบเลือกได้หลายอัน */
+.chip-group { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.chip input:checked + span {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* การ์ดความเห็นในหน้าสรุปผล */
+.comment {
+  padding: var(--space-3);
+  border-inline-start: 3px solid var(--color-primary);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+}
+.comment__meta {
+  margin-bottom: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--color-text-faint);
+}
+
+/* สถานะการซิงก์ขึ้นเซิร์ฟเวอร์ */
+.sync-badge { font-size: var(--fs-xs); }
+.sync-badge--ok      { color: var(--color-success); }
+.sync-badge--pending { color: var(--color-warning); }
+.sync-badge--local   { color: var(--color-text-faint); }
 
 
 /* ============================================================================
