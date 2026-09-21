@@ -235,8 +235,8 @@ svg { display: block; }
   position: absolute;
   top: var(--space-2);
   right: var(--space-3);
-  width: 120px;
-  height: 120px;
+  width: 58px;
+  height: 58px;
   display: grid;
   place-items: center;
   font-size: var(--fs-sm);
