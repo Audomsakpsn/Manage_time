@@ -117,16 +117,16 @@ const TABS = ['today', 'matrix', 'calendar', 'focus', 'goals', 'stats', 'reminde
 function switchTab(tab) {
   TABS.forEach(t => {
     document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
-    document.querySelector(`.tab[data-tab="${t}"]`).classList.toggle('is-active', t === tab);
+    document.querySelectorAll(`[data-tab="${t}"]`).forEach(btn => {
+      btn.classList.toggle('is-active', t === tab);
+    });
   });
   if (tab === 'calendar') renderCalendar();
   if (tab === 'today')    renderToday();
   if (tab === 'stats')    renderStats();
   if (tab === 'goals')    renderGoals();
   if (tab === 'focus')    renderFocusPanel();
-
 }
-
 
 /* ============================================================================
    LEGENDS

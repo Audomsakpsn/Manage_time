@@ -228,6 +228,33 @@ svg { display: block; }
 }
 
 .header-tools { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.app-header { position: relative; }   /* เพิ่มบรรทัดนี้ในกฎ .app-header เดิม */
+
+/* --- ปุ่มประเมินผลที่มุมขวาบน (จางไว้ จะเห็นชัดเมื่อเอาเมาส์ไปชี้) --- */
+.feedback-corner {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  opacity: 0.15;
+  cursor: pointer;
+  transition: opacity var(--transition), background var(--transition);
+}
+.feedback-corner:hover,
+.feedback-corner:focus-visible,
+.feedback-corner.is-active {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.18);
+}
 
 /* --- กล่องตั้งเวลาบนหัวเว็บ --- */
 .pomodoro {

@@ -41,7 +41,13 @@
     <button class="tab" data-tab="goals" onclick="switchTab('goals')">🎯 เป้าหมาย</button>
     <button class="tab" data-tab="stats" onclick="switchTab('stats')">📈 สถิติ</button>
     <button class="tab" data-tab="reminders" onclick="switchTab('reminders')">🔔 เตือนความจำ</button>
-    <button class="tab" data-tab="feedback" onclick="switchTab('feedback')">🗳️ ประเมินผล</button>
+      <header class="app-header">
+    <button class="feedback-corner" data-tab="feedback"
+            onclick="switchTab('feedback')"
+            title="ประเมินผล" aria-label="ไปที่หน้าประเมินผล">🗳️</button>
+
+    <div class="container app-header__inner">
+    ...
   </div>
 </nav>
 
