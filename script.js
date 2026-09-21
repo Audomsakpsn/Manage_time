@@ -4,8 +4,6 @@
    สีทั้งหมดในไฟล์นี้อ้างอิงตัวแปร CSS จาก style.css (เช่น var(--q1))
    ถ้าอยากเปลี่ยนสี ให้แก้ที่ style.css ไม่ต้องแก้ไฟล์นี้
    ========================================================================== */
-
-
 /* ============================================================================
    STATE
    ========================================================================== */
@@ -42,7 +40,6 @@ function levelOf(pct) {
   for (const l of LEVELS) if (pct >= l.min) level = l;
   return level;
 }
-
 
 
 /* ============================================================================
@@ -1209,15 +1206,18 @@ function startLocationWatch() {
 /* ============================================================================
    FEEDBACK — ส่งตรงเข้าฐานข้อมูลของระบบ ไม่แสดงผลใดๆ บนหน้าเว็บนี้
    ----------------------------------------------------------------------------
-   เมื่อกด "ส่งแบบประเมิน" หน้าเว็บจะยิง POST ไปที่ /api/feedback ซึ่งเป็นส่วนหนึ่งของ
-   server.js เซิร์ฟเวอร์จะเขียนคำตอบต่อท้ายไฟล์ feedback.json ทันที (นี่คือ "ฐานข้อมูล"
-   ของระบบตามที่โจทย์ต้องการ) ผู้สอน/ผู้วิจัยเปิดไฟล์นั้นดูได้โดยตรงจากเครื่อง ไม่มีหน้าใด
-   ในเว็บแอปนี้แสดงคำตอบย้อนกลับให้ผู้ตอบหรือผู้ใช้คนอื่นเห็น
+   เมื่อกด "ส่งแบบประเมิน" หน้าเว็บจะยิง POST (JSON) ไปที่ Google Apps Script Web App
+   (ลิงก์อยู่ที่ FEEDBACK_URL ด้านล่าง) ซึ่งเขียนคำตอบต่อท้ายชีต "feedback" ใน Google Sheet
+   ของผู้วิจัยทันที (นี่คือ "ฐานข้อมูล" ของระบบตามที่โจทย์ต้องการ) ผู้สอน/ผู้วิจัยเปิดดูผลได้
+   จาก Google Sheet โดยตรง ไม่มีหน้าใดในเว็บแอปนี้แสดงคำตอบย้อนกลับให้ผู้ตอบหรือผู้ใช้คนอื่นเห็น
 
-   ต้องรันด้วย `node server.js` เท่านั้นฟีเจอร์นี้ถึงจะทำงาน ถ้าเปิดเว็บด้วยวิธีอื่น
-   (เช่น python http.server หรือดับเบิลคลิกไฟล์ตรงๆ) การส่งจะขึ้นข้อความแจ้งว่าส่งไม่สำเร็จ
-   และคำตอบจะถูกเก็บสำรองไว้ใน localStorage ของเครื่องนั้นชั่วคราว แล้วพยายามส่งซ้ำให้เอง
-   เบื้องหลังทุก 2 นาทีจนกว่าจะเปิดเซิร์ฟเวอร์แล้วส่งสำเร็จ (ยังไม่แสดงผลใดๆ บนหน้าเว็บเช่นกัน)
+   ไม่ต้องรันเซิร์ฟเวอร์เอง ขอแค่เครื่องออนไลน์ ถ้าส่งไม่สำเร็จ (เช่น อินเทอร์เน็ตหลุด)
+   คำตอบจะถูกเก็บสำรองไว้ใน localStorage ของเครื่องนั้นชั่วคราว แล้วพยายามส่งซ้ำให้เอง
+   เบื้องหลังทุก 2 นาทีจนกว่าจะส่งสำเร็จ (ยังไม่แสดงผลใดๆ บนหน้าเว็บเช่นกัน)
+
+   หมายเหตุ: ใช้ mode 'no-cors' เพราะ Apps Script ไม่รองรับ CORS หน้าเว็บจึงอ่านผลตอบกลับไม่ได้
+   ข้อความ "ส่งเรียบร้อย" หมายถึงส่งคำขอออกไปได้ ไม่ได้ยืนยันว่า Sheet บันทึกแล้ว ตอนตั้งค่า
+   ครั้งแรกให้ทดลองส่งแล้วเปิด Sheet ตรวจว่ามีแถวใหม่ขึ้นจริง
    ========================================================================== */
 
 /* ข้อคำถามแบบให้คะแนน 1-5 แก้/เพิ่มข้อได้ตามการทดลองของคุณ */
@@ -1281,7 +1281,7 @@ function buildFeedbackRecord() {
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     submittedAt: new Date().toISOString(),
-    respondent: document.getElementById('fb-respondent').value.trim() || 'ไม่ระบุ',
+    respondent: document.getElementById('fb-respondent')?.value.trim() || 'ไม่ระบุ',
     duration: document.getElementById('fb-duration').value,
     scores,
     solveScore: Number(document.getElementById('fb-solve').value),
@@ -1299,14 +1299,16 @@ function resetFeedbackForm() {
   document.getElementById('fb-nps-val').innerText = '7';
 }
 
-/* --- ส่งคำตอบหนึ่งชุดไปที่ /api/feedback บน server.js --- */
+/* --- ส่งคำตอบหนึ่งชุดไปที่ Google Apps Script (เขียนลง Google Sheet) --- */
+const FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbxT6d8h2L2hKpr8ajz-HE2F0oX3Sk5XDKcPz7cNQDXb1nlcdmteK2qYYj_bNRmStIC2Gw/exec';
+
 async function sendFeedbackToServer(record) {
-  const res = await fetch('/api/feedback', {
+  await fetch(FEEDBACK_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(record),
   });
-  if (!res.ok) throw new Error(`server responded ${res.status}`);
 }
 
 /* --- เมื่อกดปุ่มส่งแบบประเมิน --- */
@@ -1326,12 +1328,12 @@ async function submitFeedback(e) {
     status.style.color = 'var(--color-success)';
     status.innerText = 'ส่งคำตอบเรียบร้อย ขอบคุณมาก 🙏';
   } catch (err) {
-    /* ส่งไม่สำเร็จ (ยังไม่ได้รัน node server.js) — เก็บสำรองไว้ในเครื่องแล้วลองส่งซ้ำอัตโนมัติ */
+    /* ส่งไม่สำเร็จ (เช่น อินเทอร์เน็ตหลุด) — เก็บสำรองไว้ในเครื่องแล้วลองส่งซ้ำอัตโนมัติ */
     feedbackQueue.push(record);
     saveFeedbackQueue();
     resetFeedbackForm();
     status.style.color = 'var(--color-warning)';
-    status.innerText = 'ยังส่งขึ้นฐานข้อมูลไม่สำเร็จ (ต้องรันด้วย node server.js) ระบบเก็บคำตอบไว้ชั่วคราวและจะลองส่งซ้ำให้อัตโนมัติ';
+    status.innerText = 'ส่งไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต ระบบเก็บคำตอบไว้ชั่วคราวและจะลองส่งซ้ำให้อัตโนมัติ';
   }
   btn.disabled = false;
   setTimeout(() => { status.innerText = ''; }, 6000);

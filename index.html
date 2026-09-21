@@ -10,11 +10,10 @@
 <body>
 
 <header class="app-header">
-    <button class="feedback-corner" data-tab="feedback"
+  <button class="feedback-corner" data-tab="feedback"
           onclick="switchTab('feedback')"
           title="ประเมินผล" aria-label="ไปที่หน้าประเมินผล">🗳️</button>
-  <div class="container app-header__inner">
-    <div class="brand">
+
   <div class="container app-header__inner">
     <div class="brand">
       <h1 class="brand__title">⏳ Eisenhower Life Manager</h1>
@@ -392,8 +391,9 @@
   </section>
   <!-- ==================== ประเมินผล ====================
        ส่วนนี้แสดงเฉพาะฟอร์ม ไม่มีการแสดงผลสรุป/รายการคำตอบบนหน้าเว็บ
-       คำตอบทุกชุดจะถูกส่งตรงไปเก็บที่ไฟล์ feedback.json ผ่าน server.js
-       ผู้สอน/ผู้วิจัยเปิดดูผลได้จากไฟล์นั้นโดยตรง ไม่ผ่านหน้าเว็บนี้ -->
+       เปิดหน้านี้ด้วยปุ่ม 🗳️ เล็กๆ ที่มุมขวาบนของหัวเว็บ (ไม่มีในแถบแท็บ)
+       คำตอบทุกชุดจะถูกส่งไปเก็บที่ Google Sheet ผ่าน Google Apps Script (ตั้งลิงก์ที่ FEEDBACK_URL ใน script.js)
+       ผู้สอน/ผู้วิจัยเปิดดูผลได้จาก Google Sheet โดยตรง ไม่ผ่านหน้าเว็บนี้ -->
   <section id="view-feedback" class="hidden">
     <div class="card" style="max-width:640px;margin-inline:auto">
       <h2 class="card__title">🗳️ แบบประเมินหลังใช้งาน</h2>
@@ -477,7 +477,7 @@
 </div>
 
 <footer class="app-footer">
-  ข้อมูลทั้งหมดถูกบันทึกไว้ในเบราว์เซอร์ของคุณ (localStorage) ไม่มีการส่งออกไปที่เซิร์ฟเวอร์
+  ข้อมูลงาน เป้าหมาย และเวลาโฟกัสถูกบันทึกไว้ในเบราว์เซอร์ของคุณ (localStorage) ส่วนแบบประเมินจะถูกส่งให้ผู้วิจัยเมื่อคุณกดส่งเท่านั้น
 </footer>
 
 <script src="script.js"></script>

@@ -228,9 +228,9 @@ svg { display: block; }
 }
 
 .header-tools { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
-.app-header { position: relative; }   /* เพิ่มบรรทัดนี้ในกฎ .app-header เดิม */
+.app-header { position: relative; }
 
-/* --- ปุ่มประเมินผลที่มุมขวาบน (จางไว้ จะเห็นชัดเมื่อเอาเมาส์ไปชี้) --- */
+/* --- ปุ่มประเมินผลที่มุมขวาบนของหัวเว็บ (แทนแท็บประเมินผลเดิม) --- */
 .feedback-corner {
   position: absolute;
   top: var(--space-2);
