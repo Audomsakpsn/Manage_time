@@ -306,20 +306,21 @@ svg { display: block; }
 
 /* --- ตาราง --- */
 .grid { display: grid; gap: var(--gap); }
-.grid--2 { grid-template-columns: repeat(2, 1fr); }
-.grid--3 { grid-template-columns: repeat(3, 1fr); }
-.grid--4 { grid-template-columns: repeat(4, 1fr); }
-.grid--sidebar { grid-template-columns: 300px 1fr; align-items: start; }
+/* ใช้ minmax(0, 1fr) แทน 1fr เพื่อให้คอลัมน์หดได้ ข้อความยาวๆ (เช่น คำอธิบายงาน) จะได้ไม่ดันคอลัมน์อื่นจนแคบ */
+.grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid--sidebar { grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
 
 .span-2 { grid-column: span 2; }
 
 @media (max-width: 900px) {
-  .grid--3, .grid--sidebar { grid-template-columns: 1fr; }
-  .grid--4 { grid-template-columns: repeat(2, 1fr); }
+  .grid--3, .grid--sidebar { grid-template-columns: minmax(0, 1fr); }
+  .grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .span-2 { grid-column: auto; }
 }
 @media (max-width: 640px) {
-  .grid--2, .grid--4 { grid-template-columns: 1fr; }
+  .grid--2, .grid--4 { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* --- กองซ้อนแนวตั้ง --- */
